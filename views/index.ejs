@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Noticias Recientes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+    }
+    
+    h1 {
+      color: #2c3e50;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid #3498db;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      animation: fadeInDown 1s ease-out;
+    }
+    
+    .news-card {
+      height: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      border: none;
+      animation: fadeIn 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .news-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .news-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 0;
+      background-color: #3498db;
+      transition: height 0.3s ease;
+    }
+    
+    .news-card:hover::before {
+      height: 100%;
+    }
+    
+    .news-card .card-body {
+      padding: 1.5rem;
+    }
+    
+    .news-card .card-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #34495e;
+    }
+    
+    .news-card a {
+      color: inherit;
+      text-decoration: none;
+    }
+    
+    .news-card a:hover {
+      color: #3498db;
+    }
+    
+    .card-category {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: #3498db;
+      color: white;
+      padding: 0.3rem 1rem;
+      border-bottom-left-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .card-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background-color: rgba(52, 152, 219, 0.1);
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+    
+    .card-icon i {
+      font-size: 1.5rem;
+      color: #3498db;
+    }
+    
+    .card-date {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .pagination-container {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .pagination {
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border-radius: 50px;
+      overflow: hidden;
+    }
+    
+    .page-item:first-child .page-link {
+      border-top-left-radius: 50px;
+      border-bottom-left-radius: 50px;
+    }
+    
+    .page-item:last-child .page-link {
+      border-top-right-radius: 50px;
+      border-bottom-right-radius: 50px;
+    }
+    
+    .page-link {
+      color: #3498db;
+      border: none;
+      padding: 0.5rem 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .page-link:hover {
+      background-color: rgba(52, 152, 219, 0.1);
+      color: #3498db;
+    }
+    
+    .page-item.active .page-link {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .page-item.disabled .page-link {
+      color: #6c757d;
+      pointer-events: none;
+      background-color: #fff;
+    }
+    
+    /* Animaciones */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    /* Aplicando delay a cada elemento */
+    .news-card-1 { animation-delay: 0.1s; }
+    .news-card-2 { animation-delay: 0.2s; }
+    .news-card-3 { animation-delay: 0.3s; }
+    .news-card-4 { animation-delay: 0.4s; }
+    .news-card-5 { animation-delay: 0.5s; }
+    .news-card-6 { animation-delay: 0.6s; }
+
+    /* Para mostrar/ocultar páginas */
+    .news-page {
+      display: none;
+    }
+    
+    .news-page.active {
+      display: flex;
+    }
+    
+    /* Contador de noticias y páginas */
+    .pagination-info {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4"><i class="fas fa-newspaper me-2"></i> Últimas Noticias - El País</h1>
+    
+    <% 
+    // Configuración de paginación
+    const itemsPerPage = 9;
+    const totalItems = noticias.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    %>
+    
+    <% for(let page = 1; page <= totalPages; page++) { %>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4 news-page <%= page === 1 ? 'active' : '' %>" id="page<%= page %>">
+        <% 
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+        
+        for(let i = startIndex; i < endIndex; i++) { 
+          const noticia = noticias[i];
+          if(!noticia) continue; // Evita errores si no hay suficientes noticias
+        %>
+          <div class="col">
+            <div class="card news-card news-card-<%= (i % itemsPerPage) + 1 %>">
+              <div class="card-body">
+                <div class="card-category">Actualidad</div>
+                <div class="card-icon">
+                  <i class="fas fa-newspaper"></i>
+                </div>
+                <div class="card-date"><i class="far fa-calendar-alt me-2"></i> Hoy</div>
+                <h5 class="card-title">
+                  <a href="<%= noticia.link %>" target="_blank">
+                    <%= noticia.titulo %>
+                  </a>
+                </h5>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <a href="<%= noticia.link %>" class="btn btn-sm btn-outline-primary" target="_blank">
+                    Leer más <i class="fas fa-arrow-right ms-1"></i>
+                  </a>
+                  <div>
+                    <button class="btn btn-sm btn-light me-1" title="Compartir">
+                      <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light" title="Guardar">
+                      <i class="far fa-bookmark"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+    
+    <!-- Paginación -->
+    <div class="pagination-container">
+      <nav aria-label="Navegación de páginas">
+        <ul class="pagination">
+          <li class="page-item disabled" id="prev-page">
+            <a class="page-link" href="#" aria-label="Anterior">
+              <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
+            </a>
+          </li>
+          
+          <% for(let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === 1 ? 'active' : '' %>" data-page="<%= i %>">
+              <a class="page-link" href="#page<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+          
+          <li class="page-item <%= totalPages <= 1 ? 'disabled' : '' %>" id="next-page">
+            <a class="page-link" href="#" aria-label="Siguiente">
+              <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    
+    <div class="pagination-info">
+      Mostrando <span id="currentPageStart">1</span>-<span id="currentPageEnd"><%= Math.min(itemsPerPage, totalItems) %></span> de <span id="totalItems"><%= totalItems %></span> noticias
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Variables para paginación
+      let currentPage = 1;
+      const totalPages = <%= totalPages %>;
+      const itemsPerPage = <%= itemsPerPage %>;
+      const totalItems = <%= totalItems %>;
+      
+      // Función para cambiar de página
+      function goToPage(pageNum) {
+        if (pageNum < 1 || pageNum > totalPages) return;
+        
+        // Ocultar todas las páginas
+        document.querySelectorAll('.news-page').forEach(page => {
+          page.classList.remove('active');
+        });
+        
+        // Mostrar la página seleccionada
+        document.getElementById('page' + pageNum).classList.add('active');
+        
+        // Actualizar la clase active en la paginación
+        document.querySelectorAll('.pagination .page-item').forEach(item => {
+          if (item.dataset.page) {
+            item.classList.remove('active');
+          }
+        });
+        document.querySelector(`.pagination .page-item[data-page="${pageNum}"]`).classList.add('active');
+        
+        // Actualizar los botones de anterior/siguiente
+        document.getElementById('prev-page').classList.toggle('disabled', pageNum === 1);
+        document.getElementById('next-page').classList.toggle('disabled', pageNum === totalPages);
+        
+        // Actualizar el contador de elementos
+        const startItem = (pageNum - 1) * itemsPerPage + 1;
+        const endItem = Math.min(pageNum * itemsPerPage, totalItems);
+        document.getElementById('currentPageStart').textContent = startItem;
+        document.getElementById('currentPageEnd').textContent = endItem;
+        
+        // Actualizar la página actual
+        currentPage = pageNum;
+        
+        // Desplazarse al principio de la sección
+        window.scrollTo({
+          top: document.querySelector('h1').offsetTop,
+          behavior: 'smooth'
+        });
+      }
+      
+      // Configurar los event listeners para la paginación
+      document.querySelectorAll('.pagination .page-item[data-page]').forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          goToPage(parseInt(this.dataset.page));
+        });
+      });
+      
+      // Botones anterior y siguiente
+      document.getElementById('prev-page').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage > 1) {
+          goToPage(currentPage - 1);
+        }
+      });
+      
+      document.getElementById('next-page').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (currentPage < totalPages) {
+          goToPage(currentPage + 1);
+        }
+      });
+      
+      // Efectos para las tarjetas
+      const cards = document.querySelectorAll('.news-card');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.classList.add('shadow-lg');
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.classList.remove('shadow-lg');
+        });
+      });
+    });
+  </script>
+</body>
+</html>
