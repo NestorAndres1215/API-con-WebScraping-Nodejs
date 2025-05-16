@@ -14,10 +14,6 @@ Este proyecto realiza **web scraping** de titulares de noticias desde una web ex
 - Bootstrap (para estilos)
 - Arquitectura MVC
 
-## 🧱 Arquitectura MVC
-
-![Arquitectura MVC](public/img/mvc.png)
-
 ## 🖼️ Vista previa de la aplicación
 ![image](https://github.com/user-attachments/assets/f574d768-e593-4463-ade9-4354735437c3)
 
