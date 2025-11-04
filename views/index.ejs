@@ -1,376 +1,248 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <title>Noticias Recientes</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Noticias Recientes - El País</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            'fade-in': 'fadeIn 0.6s ease-out forwards',
+            'slide-up': 'slideUp 0.6s ease-out forwards',
+            'pulse-slow': 'pulse 3s infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(30px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- AOS (Animate On Scroll) -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
   <style>
-    body {
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4efe9 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      min-height: 100vh;
-      padding: 2rem 0;
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
     }
-    
-    .container {
-      max-width: 1200px;
+    .card-hover:hover {
+      transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
-    
-    h1 {
-      color: #2c3e50;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 3px solid #3498db;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-      animation: fadeInDown 1s ease-out;
+    .pagination-btn {
+      @apply px-4 py-2 rounded-full transition-all duration-300 font-medium;
     }
-    
-    .news-card {
-      height: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      position: relative;
-      border: none;
-      animation: fadeIn 0.5s ease-out;
-      animation-fill-mode: both;
+    .pagination-btn:hover {
+      @apply bg-blue-600 text-white transform scale-105;
     }
-    
-    .news-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .news-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 5px;
-      height: 0;
-      background-color: #3498db;
-      transition: height 0.3s ease;
-    }
-    
-    .news-card:hover::before {
-      height: 100%;
-    }
-    
-    .news-card .card-body {
-      padding: 1.5rem;
-    }
-    
-    .news-card .card-title {
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: #34495e;
-    }
-    
-    .news-card a {
-      color: inherit;
-      text-decoration: none;
-    }
-    
-    .news-card a:hover {
-      color: #3498db;
-    }
-    
-    .card-category {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: #3498db;
-      color: white;
-      padding: 0.3rem 1rem;
-      border-bottom-left-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    
-    .card-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 50px;
-      height: 50px;
-      background-color: rgba(52, 152, 219, 0.1);
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-    
-    .card-icon i {
-      font-size: 1.5rem;
-      color: #3498db;
-    }
-    
-    .card-date {
-      font-size: 0.85rem;
-      color: #7f8c8d;
-      margin-bottom: 0.5rem;
-    }
-    
-    .pagination-container {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-    
-    .pagination {
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      border-radius: 50px;
-      overflow: hidden;
-    }
-    
-    .page-item:first-child .page-link {
-      border-top-left-radius: 50px;
-      border-bottom-left-radius: 50px;
-    }
-    
-    .page-item:last-child .page-link {
-      border-top-right-radius: 50px;
-      border-bottom-right-radius: 50px;
-    }
-    
-    .page-link {
-      color: #3498db;
-      border: none;
-      padding: 0.5rem 1rem;
-      transition: all 0.3s ease;
-    }
-    
-    .page-link:hover {
-      background-color: rgba(52, 152, 219, 0.1);
-      color: #3498db;
-    }
-    
-    .page-item.active .page-link {
-      background-color: #3498db;
-      color: white;
-    }
-
-    .page-item.disabled .page-link {
-      color: #6c757d;
-      pointer-events: none;
-      background-color: #fff;
-    }
-    
-    /* Animaciones */
-    @keyframes fadeInDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    
-    /* Aplicando delay a cada elemento */
-    .news-card-1 { animation-delay: 0.1s; }
-    .news-card-2 { animation-delay: 0.2s; }
-    .news-card-3 { animation-delay: 0.3s; }
-    .news-card-4 { animation-delay: 0.4s; }
-    .news-card-5 { animation-delay: 0.5s; }
-    .news-card-6 { animation-delay: 0.6s; }
-
-    /* Para mostrar/ocultar páginas */
-    .news-page {
-      display: none;
-    }
-    
-    .news-page.active {
-      display: flex;
-    }
-    
-    /* Contador de noticias y páginas */
-    .pagination-info {
-      text-align: center;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #7f8c8d;
+    .pagination-btn.active {
+      @apply bg-blue-600 text-white shadow-lg;
     }
   </style>
 </head>
-<body>
-  <div class="container mt-5">
-    <h1 class="mb-4"><i class="fas fa-newspaper me-2"></i> Últimas Noticias - El País</h1>
-    
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-500">
+
+  <div class="container mx-auto px-4 py-8 max-w-7xl">
+    <!-- Header -->
+    <header class="text-center mb-12" data-aos="fade-down">
+      <h1 class="text-5xl md:text-6xl font-bold text-gray-800 dark:text-white mb-3">
+        <i class="fas fa-newspaper text-blue-600 animate-pulse-slow"></i>
+        Últimas Noticias
+      </h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300">El País | Actualizado hoy</p>
+    </header>
+
+    <!-- Noticias por página -->
     <% 
-    // Configuración de paginación
-    const itemsPerPage = 9;
-    const totalItems = noticias.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+      const itemsPerPage = 9;
+      const totalItems = noticias.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
     %>
-    
+
     <% for(let page = 1; page <= totalPages; page++) { %>
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4 news-page <%= page === 1 ? 'active' : '' %>" id="page<%= page %>">
-        <% 
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 news-page <%= page === 1 ? 'active' : '' %>" 
+           id="page<%= page %>" style="display: <%= page === 1 ? 'grid' : 'none' %>;">
         
-        for(let i = startIndex; i < endIndex; i++) { 
-          const noticia = noticias[i];
-          if(!noticia) continue; // Evita errores si no hay suficientes noticias
+        <% 
+          const startIndex = (page - 1) * itemsPerPage;
+          const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+          
+          for(let i = startIndex; i < endIndex; i++) { 
+            const noticia = noticias[i];
+            if(!noticia) continue;
+            const delay = ((i % itemsPerPage) * 100) + 'ms';
         %>
-          <div class="col">
-            <div class="card news-card news-card-<%= (i % itemsPerPage) + 1 %>">
-              <div class="card-body">
-                <div class="card-category">Actualidad</div>
-                <div class="card-icon">
-                  <i class="fas fa-newspaper"></i>
-                </div>
-                <div class="card-date"><i class="far fa-calendar-alt me-2"></i> Hoy</div>
-                <h5 class="card-title">
-                  <a href="<%= noticia.link %>" target="_blank">
-                    <%= noticia.titulo %>
-                  </a>
-                </h5>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                  <a href="<%= noticia.link %>" class="btn btn-sm btn-outline-primary" target="_blank">
-                    Leer más <i class="fas fa-arrow-right ms-1"></i>
-                  </a>
-                  <div>
-                    <button class="btn btn-sm btn-light me-1" title="Compartir">
-                      <i class="fas fa-share-alt"></i>
-                    </button>
-                    <button class="btn btn-sm btn-light" title="Guardar">
-                      <i class="far fa-bookmark"></i>
-                    </button>
-                  </div>
+          <article 
+            class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg card-hover group"
+            data-aos="fade-up" 
+            data-aos-delay="<%= delay %>"
+            style="animation-delay: <%= delay %>">
+            
+            <div class="p-6 relative">
+              <!-- Categoría -->
+              <span class="absolute top-0 right-0 bg-gradient-to-br from-blue-600 to-blue-700 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">
+                Actualidad
+              </span>
+
+              <!-- Icono animado -->
+              <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <i class="fas fa-newspaper text-blue-600 text-xl"></i>
+              </div>
+
+              <!-- Fecha -->
+              <p class="text-sm text-gray-500 dark:text-gray-400 flex items-center mb-2">
+                <i class="far fa-calendar-alt mr-2"></i> Hoy
+              </p>
+
+              <!-- Título -->
+              <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <a href="<%= noticia.link %>" target="_blank" class="hover:underline">
+                  <%= noticia.titulo %>
+                </a>
+              </h3>
+
+              <!-- Botones -->
+              <div class="flex justify-between items-center mt-5">
+                <a href="<%= noticia.link %>" target="_blank" 
+                   class="inline-flex items-center text-blue-600 dark:text-blue-400 font-medium hover:gap-3 transition-all duration-300">
+                  Leer más 
+                  <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                </a>
+
+                <div class="flex gap-2">
+                  <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-900 text-gray-600 dark:text-gray-300 transition-colors" title="Compartir">
+                    <i class="fas fa-share-alt"></i>
+                  </button>
+                  <button class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900 text-gray-600 dark:text-gray-300 transition-colors" title="Guardar">
+                    <i class="far fa-bookmark"></i>
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
+          </article>
         <% } %>
       </div>
     <% } %>
-    
+
     <!-- Paginación -->
-    <div class="pagination-container">
-      <nav aria-label="Navegación de páginas">
-        <ul class="pagination">
-          <li class="page-item disabled" id="prev-page">
-            <a class="page-link" href="#" aria-label="Anterior">
-              <span aria-hidden="true"><i class="fas fa-chevron-left"></i></span>
-            </a>
-          </li>
-          
-          <% for(let i = 1; i <= totalPages; i++) { %>
-            <li class="page-item <%= i === 1 ? 'active' : '' %>" data-page="<%= i %>">
-              <a class="page-link" href="#page<%= i %>"><%= i %></a>
-            </li>
-          <% } %>
-          
-          <li class="page-item <%= totalPages <= 1 ? 'disabled' : '' %>" id="next-page">
-            <a class="page-link" href="#" aria-label="Siguiente">
-              <span aria-hidden="true"><i class="fas fa-chevron-right"></i></span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    
-    <div class="pagination-info">
-      Mostrando <span id="currentPageStart">1</span>-<span id="currentPageEnd"><%= Math.min(itemsPerPage, totalItems) %></span> de <span id="totalItems"><%= totalItems %></span> noticias
+    <div class="flex flex-col items-center mt-12 space-y-4">
+      <div class="flex gap-2 flex-wrap justify-center">
+        <button id="prev-page" class="pagination-btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= totalPages <= 1 ? 'disabled' : '' %>>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <% for(let i = 1; i <= totalPages; i++) { %>
+          <button class="pagination-btn <%= i === 1 ? 'active' : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300' %>" 
+                  data-page="<%= i %>">
+            <%= i %>
+          </button>
+        <% } %>
+
+        <button id="next-page" class="pagination-btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" <%= totalPages <= 1 ? 'disabled' : '' %>>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <p class="text-sm text-gray-600 dark:text-gray-400">
+        Mostrando <span id="currentPageStart">1</span>-<span id="currentPageEnd"><%= Math.min(itemsPerPage, totalItems) %></span> 
+        de <span id="totalItems"><%= totalItems %></span> noticias
+      </p>
     </div>
   </div>
 
-  <script>
+  <!-- JavaScript -->
+  <script >
+    AOS.init({
+      duration: 600,
+      once: true,
+      offset: 100
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
-      // Variables para paginación
       let currentPage = 1;
       const totalPages = <%= totalPages %>;
       const itemsPerPage = <%= itemsPerPage %>;
       const totalItems = <%= totalItems %>;
-      
-      // Función para cambiar de página
-      function goToPage(pageNum) {
-        if (pageNum < 1 || pageNum > totalPages) return;
-        
+
+      function goToPage(page) {
+        if (page < 1 || page > totalPages) return;
+
         // Ocultar todas las páginas
-        document.querySelectorAll('.news-page').forEach(page => {
-          page.classList.remove('active');
+        document.querySelectorAll('.news-page').forEach(p => p.style.display = 'none');
+        const targetPage = document.getElementById('page' + page);
+        targetPage.style.display = 'grid';
+
+        // Animar entrada
+        targetPage.querySelectorAll('[data-aos]').forEach(el => {
+          el.setAttribute('data-aos', 'fade-up');
+          AOS.refreshHard();
         });
-        
-        // Mostrar la página seleccionada
-        document.getElementById('page' + pageNum).classList.add('active');
-        
-        // Actualizar la clase active en la paginación
-        document.querySelectorAll('.pagination .page-item').forEach(item => {
-          if (item.dataset.page) {
-            item.classList.remove('active');
-          }
+
+        // Actualizar paginación
+        document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+          btn.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-lg');
+          btn.classList.add('bg-white', 'dark:bg-gray-800', 'text-gray-700', 'dark:text-gray-300');
         });
-        document.querySelector(`.pagination .page-item[data-page="${pageNum}"]`).classList.add('active');
-        
-        // Actualizar los botones de anterior/siguiente
-        document.getElementById('prev-page').classList.toggle('disabled', pageNum === 1);
-        document.getElementById('next-page').classList.toggle('disabled', pageNum === totalPages);
-        
-        // Actualizar el contador de elementos
-        const startItem = (pageNum - 1) * itemsPerPage + 1;
-        const endItem = Math.min(pageNum * itemsPerPage, totalItems);
-        document.getElementById('currentPageStart').textContent = startItem;
-        document.getElementById('currentPageEnd').textContent = endItem;
-        
-        // Actualizar la página actual
-        currentPage = pageNum;
-        
-        // Desplazarse al principio de la sección
-        window.scrollTo({
-          top: document.querySelector('h1').offsetTop,
-          behavior: 'smooth'
-        });
+        const activeBtn = document.querySelector(`.pagination-btn[data-page="${page}"]`);
+        if (activeBtn) {
+          activeBtn.classList.add('active', 'bg-blue-600', 'text-white', 'shadow-lg');
+          activeBtn.classList.remove('bg-white', 'text-gray-700');
+        }
+
+        // Botones prev/next
+        document.getElementById('prev-page').disabled = page === 1;
+        document.getElementById('next-page').disabled = page === totalPages;
+
+        // Contador
+        const start = (page - 1) * itemsPerPage + 1;
+        const end = Math.min(page * itemsPerPage, totalItems);
+        document.getElementById('currentPageStart').textContent = start;
+        document.getElementById('currentPageEnd').textContent = end;
+
+        currentPage = page;
+
+        // Scroll suave
+        document.querySelector('h1').scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      
-      // Configurar los event listeners para la paginación
-      document.querySelectorAll('.pagination .page-item[data-page]').forEach(item => {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          goToPage(parseInt(this.dataset.page));
-        });
+
+      // Eventos paginación
+      document.querySelectorAll('.pagination-btn[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => goToPage(parseInt(btn.dataset.page)));
       });
-      
-      // Botones anterior y siguiente
-      document.getElementById('prev-page').addEventListener('click', function(e) {
-        e.preventDefault();
-        if (currentPage > 1) {
-          goToPage(currentPage - 1);
-        }
+
+      document.getElementById('prev-page').addEventListener('click', () => {
+        if (currentPage > 1) goToPage(currentPage - 1);
       });
-      
-      document.getElementById('next-page').addEventListener('click', function(e) {
-        e.preventDefault();
-        if (currentPage < totalPages) {
-          goToPage(currentPage + 1);
-        }
+
+      document.getElementById('next-page').addEventListener('click', () => {
+        if (currentPage < totalPages) goToPage(currentPage + 1);
       });
-      
-      // Efectos para las tarjetas
-      const cards = document.querySelectorAll('.news-card');
-      cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-          this.classList.add('shadow-lg');
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.classList.remove('shadow-lg');
-        });
-      });
+
+      // Dark mode toggle (opcional)
+      const darkToggle = document.createElement('button');
+      darkToggle.innerHTML = `<i class="fas fa-moon"></i>`;
+      darkToggle.className = 'fixed bottom-6 right-6 p-4 bg-white dark:bg-gray-800 rounded-full shadow-xl hover:scale-110 transition-all z-50';
+      darkToggle.onclick = () => document.documentElement.classList.toggle('dark');
+      document.body.appendChild(darkToggle);
     });
   </script>
 </body>
